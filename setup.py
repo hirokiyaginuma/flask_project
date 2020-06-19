@@ -8,5 +8,10 @@ setup(
     zip_safe=False,
     install_requires=[
         'flask',
+        'flask_bootstrap',
+        'flask_wtf',
+        'flask_sqlalchemy',
+        'flask_login',
+        'wtforms',
     ],
 )

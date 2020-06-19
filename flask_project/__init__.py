@@ -25,6 +25,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    @app.route('/')
+    def index():
+        return 'This is the index page!'
+
     # a simple page that says hello
     @app.route('/hello')
     def hello():
