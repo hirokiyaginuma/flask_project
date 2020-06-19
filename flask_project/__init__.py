@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-def create_app(test_config=None, *args):
+def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
@@ -28,10 +28,10 @@ def create_app(test_config=None, *args):
     def hello():
         return 'Hello, World!'
 
-    from flask_project import db
+    from . import db
     db.init_app(app)
     
-    from flask_project import auth
+    from . import auth
     app.register_blueprint(auth.bp)
 
     return app
