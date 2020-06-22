@@ -7,13 +7,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from flask_project.db import get_db
 
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+bp = Blueprint('meetup', __name__, url_prefix='/meetup')
 
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('meetup.login'))
 
         return view(**kwargs)
 
@@ -53,11 +53,11 @@ def register():
                 (username, generate_password_hash(password))
             )
             db.commit()
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('meetup.login'))
 
         flash(error)
 
-    return render_template('auth/register.html')
+    return render_template('meetup/register.html')
     
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
@@ -82,7 +82,7 @@ def login():
 
         flash(error)
 
-    return render_template('auth/login.html')
+    return render_template('meetup/login.html')
     
 @bp.route('/logout')
 def logout():
