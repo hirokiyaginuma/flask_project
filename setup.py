@@ -13,5 +13,6 @@ setup(
         'flask_sqlalchemy',
         'flask_login',
         'wtforms',
+        'email_validator',
     ],
 )
