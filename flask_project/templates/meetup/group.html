@@ -4,10 +4,27 @@
 {% block title %}Groups - Meetup!{% endblock %}
 
 {% block content %}
-{% for message in get_flashed_messages() %}
-<div class="alert alert-primary" role="alert">{{ message }}</div>
-{% endfor %}
-  <div class="container">
-    <h2>Welcome, {{ name }}!</h2>
-  </div>
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-primary" role="alert">{{ message }}</div>
+    {% endfor %}
+    <h3>Welcome, {{ name }}!</h3>
+    <p></p> 
+    <div>
+        <a href="{{ url_for('meetup.addgroup') }}" class="btn btn-primary">Add Group</a>
+    </div>
+    <p></p>
+    <div class="row">
+        {% for group in groups %}
+        <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">{{ group.name }}</h5>
+                <p class="card-text">{{ group.description }}</p>
+                <a href="#" class="btn btn-primary">Details</a>
+              </div>
+            </div>
+        </div>
+        {% endfor %}
+</div>
 {% endblock %}

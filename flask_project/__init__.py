@@ -43,8 +43,16 @@ def create_app(test_config=None):
     @app.route('/hello')
     def hello():
         return 'Hello, World!' 
+
     
     from . import meetup
     app.register_blueprint(meetup.bp)
+
+    @app.cli.command("initdb")
+    def reset_db():
+        db.drop_all()
+        db.create_all()
+
+        print("Initialized databese")
 
     return app
