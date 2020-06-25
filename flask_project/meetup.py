@@ -3,7 +3,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_wtf import FlaskForm 
-from wtforms import StringField, PasswordField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, TextAreaField, validators
 from wtforms.validators import InputRequired, Email, Length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime
@@ -29,7 +29,9 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80), 
+        validators.EqualTo('confirm', message='Passwords must match')])
+    confirm = PasswordField('Confirm Password')
 
 class GroupForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired(), Length(max=50)])
