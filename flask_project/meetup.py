@@ -9,7 +9,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from datetime import datetime
 
 from . import login_manager
-from .models import db, User, Group
+from .models import db, User, Group, Event
 
 bp = Blueprint('meetup', __name__, url_prefix='/meetup')
 
@@ -33,6 +33,11 @@ class RegisterForm(FlaskForm):
 
 class GroupForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired(), Length(max=50)])
+    description = TextAreaField('Description', validators=[InputRequired(), Length(max=500)])
+
+class EventForm(FlaskForm):
+    name = StringField('Name', validators=[InputRequired(), Length(max=50)])
+    location = StringField('Location', validators=[InputRequired(), Length(max=50)])
     description = TextAreaField('Description', validators=[InputRequired(), Length(max=500)])
 
 @bp.route('/')
@@ -129,6 +134,33 @@ def group_detail(group_id):
     owner = User.query.filter_by(id=group.owner).first()
 
     return render_template('meetup/detail.html', group=group, owner=owner)
+
+@bp.route('/group/<int:group_id>/event')
+@login_required
+def event(group_id):
+    group = Group.query.filter_by(id=group_id).one()
+
+    return render_template('meetup/event.html', group=group)
+
+
+@bp.route('/group/<int:group_id>/event/addevent', methods=('GET', 'POST'))
+@login_required
+def addevent(group_id):
+    form = EventForm()
+    group = Group.query.filter_by(id=group_id).one()
+
+    if form.validate_on_submit():
+        new_event = Event(name=form.name.data, group=group.id, location=form.location.data, 
+            description=form.description.data)
+        db.session.add(new_event)
+        new_event.joined_user.append(current_user)
+        db.session.commit()
+
+        flash('New event has been created!')
+        return redirect(url_for('meetup.event', group_id=group_id))
+
+    return render_template('meetup/addevent.html', group=group, form=form)
+
 
 @bp.route('/api/joingroup/<int:group_id>')
 @login_required

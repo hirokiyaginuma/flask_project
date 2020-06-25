@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Groups - Meetup!{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-primary" role="alert">{{ message }}</div>
+    {% endfor %}
+    <h3>{{ group.name }} Events</h3>
+    <p></p> 
+    <div>
+        <a href="{{ url_for('meetup.addevent', group_id=group.id) }}" class="btn btn-primary">Add Event</a>
+    </div>
+    <p></p>
+    <div class="row">
+        {% for event in group.group_event %}
+        <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">{{ event.name }}</h5>
+                <p class="card-text">{{ event.location }}</p>
+                <p class="card-text">{{ event.description }}</p>
+              </div>
+            </div>
+        </div>
+        {% endfor %}
+</div>
+{% endblock %}

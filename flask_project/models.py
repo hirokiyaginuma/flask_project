@@ -8,6 +8,11 @@ groups = db.Table('groups',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
 )
 
+events = db.Table('events',
+    db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True)
@@ -16,6 +21,8 @@ class User(UserMixin, db.Model):
     owned_group = db.relationship('Group', backref='owned_group')
     joined_group = db.relationship('Group', secondary=groups, lazy='subquery',
         backref=db.backref('joined_group', lazy=True))
+    joined_event = db.relationship('Event', secondary=events, lazy='subquery',
+        backref=db.backref('joined_event', lazy=True))
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,4 +31,14 @@ class Group(db.Model):
     date_created = db.Column(db.DateTime)
     description = db.Column(db.Text)
     joined_user = db.relationship('User', secondary=groups, lazy='subquery',
-        backref=db.backref('joined_user', lazy=True))
+        backref=db.backref('joined_user_group', lazy=True))
+    group_event = db.relationship('Event', backref='group_event')
+
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    location = db.Column(db.String(50))
+    description = db.Column(db.Text)
+    group = db.Column(db.Integer, db.ForeignKey('group.id'))
+    joined_user = db.relationship('User', secondary=events, lazy='subquery',
+        backref=db.backref('joined_user_event', lazy=True))

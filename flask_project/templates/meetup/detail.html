@@ -25,6 +25,7 @@
     <p></p>
     <div>
         <a href="{{ url_for('meetup.joingroup', group_id=group.id) }}" class="btn btn-primary">Join this group</a>
+        <a href="{{ url_for('meetup.event', group_id=group.id) }}" class="btn btn-info">See events</a>
     </div>
 </div>
 {% endblock %}
