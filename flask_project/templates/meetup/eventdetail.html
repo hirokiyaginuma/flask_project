@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Event Details - Meetup!{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-primary" role="alert">{{ message }}</div>
+    {% endfor %}
+    <h3>{{ event.name }}</h3>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Event Name: {{ event.name }}</li>
+        <li class="list-group-item">Location: {{ event.location }}</li>
+        <li class="list-group-item">Description: {{ event.description }}</li>
+    </ul>
+    <p></p>
+    <h3>Member</h3>
+    <ul class="list-group list-group-flush">
+        {% for user in event.joined_user %}
+        <li class="list-group-item">{{ user.username }}</li>
+        {% endfor %}
+    </ul>
+    <p></p>
+    <div>
+        <a href="{{ url_for('meetup.joinevent', group_id=group.id, event_id=event.id) }}" class="btn btn-primary">Join this event</a>
+    </div>
+</div>
+{% endblock %}

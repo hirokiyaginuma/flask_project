@@ -111,7 +111,6 @@ def addgroup():
     form = GroupForm()
 
     if form.validate_on_submit():
-        #existing_name = None
         existing_name = Group.query.filter_by(name=form.name.data).first()
         if existing_name:
             flash("A group already exists with that name.")
@@ -140,6 +139,10 @@ def group_detail(group_id):
 def event(group_id):
     group = Group.query.filter_by(id=group_id).one()
 
+    if not (current_user in group.joined_user):
+        flash('You have to join the group to see events.')
+        return redirect(url_for('meetup.group_detail', group_id=group_id))
+
     return render_template('meetup/event.html', group=group)
 
 
@@ -148,6 +151,10 @@ def event(group_id):
 def addevent(group_id):
     form = EventForm()
     group = Group.query.filter_by(id=group_id).one()
+
+    if not (current_user in group.joined_user):
+        flash('You have to join the group to see events.')
+        return redirect(url_for('meetup.group_detail', group_id=group_id))
 
     if form.validate_on_submit():
         new_event = Event(name=form.name.data, group=group.id, location=form.location.data, 
@@ -161,6 +168,17 @@ def addevent(group_id):
 
     return render_template('meetup/addevent.html', group=group, form=form)
 
+@bp.route('/group/<int:group_id>/event/<int:event_id>')
+@login_required
+def event_detail(group_id, event_id):
+    group = Group.query.filter_by(id=group_id).one()
+    event = Event.query.filter_by(id=event_id).one()
+    
+    if not (current_user in group.joined_user):
+        flash('You have to join the group to see events.')
+        return redirect(url_for('meetup.group_detail', group_id=group_id))
+
+    return render_template('meetup/eventdetail.html', group=group, event=event)
 
 @bp.route('/api/joingroup/<int:group_id>')
 @login_required
@@ -176,3 +194,19 @@ def joingroup(group_id):
     flash('You have joined this group!')
 
     return redirect(url_for('meetup.group_detail', group_id=group_id))
+
+@bp.route('/api/joingroup/<int:group_id>/<int:event_id>')
+@login_required
+def joinevent(group_id, event_id):
+    group = Group.query.filter_by(id=group_id).one()
+    event = Event.query.filter_by(id=event_id).one()
+
+    if current_user in event.joined_user:
+        flash('You are already in the event.')
+        return redirect(url_for('meetup.event_detail', group_id=group_id, event_id=event_id))
+
+    event.joined_user.append(current_user)
+    db.session.commit()
+    flash('You have joined this group!')
+
+    return redirect(url_for('meetup.event_detail', group_id=group_id, event_id=event_id))

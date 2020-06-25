@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}Groups - Meetup!{% endblock %}
+{% block title %}Events - Meetup!{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -22,6 +22,7 @@
                 <h5 class="card-title">{{ event.name }}</h5>
                 <p class="card-text">{{ event.location }}</p>
                 <p class="card-text">{{ event.description }}</p>
+                <a href="{{ url_for('meetup.event_detail', group_id=group.id, event_id=event.id) }}" class="btn btn-primary">Details</a>
               </div>
             </div>
         </div>
