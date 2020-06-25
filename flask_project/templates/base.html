@@ -23,15 +23,18 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('meetup.index') }}">Home</a>
             </li>
-            <li class="nav-item">
+            {% if not isloggedin %}
+            <li class="nav-item log0">
               <a class="nav-link" href="{{ url_for('meetup.register') }}">Register</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item log0">
                 <a class="nav-link" href="{{ url_for('meetup.login') }}">Login</a>
             </li>
-            <li class="nav-item">
+            {% else %}
+            <li class="nav-item log1">
                 <a class="nav-link" href="{{ url_for('meetup.logout') }}">Logout</a>
             </li>
+            {% endif %}
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('meetup.group') }}">Groups</a>
             </li>

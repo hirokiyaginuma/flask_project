@@ -21,7 +21,7 @@
               <div class="card-body">
                 <h5 class="card-title">{{ group.name }}</h5>
                 <p class="card-text">{{ group.description }}</p>
-                <a href="#" class="btn btn-primary">Details</a>
+                <a href="{{ url_for('meetup.group_detail', group_id=group.id) }}" class="btn btn-primary">Details</a>
               </div>
             </div>
         </div>

@@ -17,6 +17,10 @@ bp = Blueprint('meetup', __name__, url_prefix='/meetup')
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+@bp.context_processor
+def inject_user():
+    return dict(isloggedin=current_user.is_authenticated)
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
@@ -38,6 +42,10 @@ def index():
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     form = RegisterForm()
+
+    if current_user.is_authenticated:
+        flash('You are already logged in.')
+        return redirect(url_for('meetup.group'))
 
     if form.validate_on_submit():
         existing_username = User.query.filter_by(username=form.username.data).first()
@@ -63,6 +71,11 @@ def register():
 def login():  
     form = LoginForm()
     error = None
+
+    if current_user.is_authenticated:
+        flash('You are already logged in.')
+        return redirect(url_for('meetup.group'))
+        
 
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -96,15 +109,38 @@ def addgroup():
         #existing_name = None
         existing_name = Group.query.filter_by(name=form.name.data).first()
         if existing_name:
-            flash("A group already exists with that username.")
+            flash("A group already exists with that name.")
         if existing_name is None:
             new_group = Group(name=form.name.data, owner=current_user.id, 
                 date_created=datetime.now(), description=form.description.data)
             db.session.add(new_group)
-            new_group.joined_group.append(current_user)
+            new_group.joined_user.append(current_user)
             db.session.commit()
 
             flash('New group has been created!')
             return redirect(url_for('meetup.group'))
 
     return render_template('meetup/addgroup.html', form=form)
+
+@bp.route('/group/<int:group_id>')
+@login_required
+def group_detail(group_id):
+    group = Group.query.filter_by(id=group_id).one()
+    owner = User.query.filter_by(id=group.owner).first()
+
+    return render_template('meetup/detail.html', group=group, owner=owner)
+
+@bp.route('/api/joingroup/<int:group_id>')
+@login_required
+def joingroup(group_id):
+    group = Group.query.filter_by(id=group_id).one()
+
+    if current_user in group.joined_user:
+        flash('You are already in the group.')
+        return redirect(url_for('meetup.group_detail', group_id=group_id))
+
+    group.joined_user.append(current_user)
+    db.session.commit()
+    flash('You have joined this group!')
+
+    return redirect(url_for('meetup.group_detail', group_id=group_id))

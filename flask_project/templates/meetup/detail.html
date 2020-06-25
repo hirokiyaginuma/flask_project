@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Groups - Meetup!{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-primary" role="alert">{{ message }}</div>
+    {% endfor %}
+    <h3>{{ group.name }}</h3>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Group Name: {{ group.name }}</li>
+        <li class="list-group-item">Host: {{ owner.username }}</li>
+        <li class="list-group-item">Date Created: {{ group.date_created }}</li>
+        <li class="list-group-item">Description: {{ group.description }}</li>
+    </ul>
+    <p></p>
+    <h3>Member</h3>
+    <ul class="list-group list-group-flush">
+        {% for user in group.joined_user %}
+        <li class="list-group-item">{{ user.username }}</li>
+        {% endfor %}
+    </ul>
+    <p></p>
+    <div>
+        <a href="{{ url_for('meetup.joingroup', group_id=group.id) }}" class="btn btn-primary">Join this group</a>
+    </div>
+</div>
+{% endblock %}
