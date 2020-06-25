@@ -55,4 +55,10 @@ def create_app(test_config=None):
 
         print("Initialized databese")
 
+    @app.cli.command("dropdb")
+    def reset_db():
+        db.drop_all()
+
+        print("Dropped all tables in databese")
+
     return app
