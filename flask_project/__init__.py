@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy  import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -38,7 +38,7 @@ def create_app(test_config=None):
     
     @app.route('/')
     def index():
-        return 'This is the index page!'
+        return render_template('index.html')
         
     @app.route('/hello')
     def hello():
