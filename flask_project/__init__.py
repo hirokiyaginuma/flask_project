@@ -3,10 +3,12 @@ import os
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy  import SQLAlchemy
+from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+migrate = Migrate()
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -28,22 +30,20 @@ def create_app(test_config=None):
 
     bootstrap = Bootstrap(app)
     db.init_app(app)
+    migrate.init_app(app, db)
     
     login_manager.init_app(app)
     login_manager.login_view = 'meetup.login'
     
+    """
     with app.app_context():
         from . import meetup
         db.create_all()
+    """
     
     @app.route('/')
     def index():
         return render_template('index.html')
-        
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!' 
-
     
     from . import meetup
     app.register_blueprint(meetup.bp)

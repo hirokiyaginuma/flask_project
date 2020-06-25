@@ -12,6 +12,7 @@ setup(
         'flask_wtf',
         'flask_sqlalchemy',
         'flask_login',
+        'Flask_Migrate',
         'wtforms',
         'email_validator',
     ],
