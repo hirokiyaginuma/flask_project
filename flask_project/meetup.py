@@ -2,14 +2,12 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_wtf import FlaskForm 
-from wtforms import StringField, PasswordField, BooleanField, TextAreaField, validators
-from wtforms.validators import InputRequired, Email, Length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime
 
 from . import login_manager
 from .models import db, User, Group, Event
+from .forms import LoginForm, RegisterForm, GroupForm, EventForm
 
 bp = Blueprint('meetup', __name__, url_prefix='/meetup')
 
@@ -20,27 +18,6 @@ def load_user(user_id):
 @bp.context_processor
 def inject_user():
     return dict(isloggedin=current_user.is_authenticated)
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
-    remember = BooleanField('Remember me')
-
-class RegisterForm(FlaskForm):
-    email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80), 
-        validators.EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Confirm Password')
-
-class GroupForm(FlaskForm):
-    name = StringField('Name', validators=[InputRequired(), Length(max=50)])
-    description = TextAreaField('Description', validators=[InputRequired(), Length(max=500)])
-
-class EventForm(FlaskForm):
-    name = StringField('Name', validators=[InputRequired(), Length(max=50)])
-    location = StringField('Location', validators=[InputRequired(), Length(max=50)])
-    description = TextAreaField('Description', validators=[InputRequired(), Length(max=500)])
 
 @bp.route('/')
 def index():
@@ -63,7 +40,8 @@ def register():
             flash("A user already exists with that email address.")
         if existing_username is None and existing_email is None:
             hashed_password = generate_password_hash(form.password.data, method='sha256')
-            new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+            new_user = User(username=form.username.data, email=form.email.data, password=hashed_password,
+                location=form.location.data, date_joined=datetime.now(), bio=form.bio.data)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
@@ -100,6 +78,11 @@ def logout():
     logout_user()
     flash('You have been successfully logged out.')
     return redirect(url_for('meetup.login'))
+
+@bp.route('/profile')
+@login_required 
+def profile():
+    return render_template('meetup/profile.html', user=current_user)
     
 @bp.route('/group')
 @login_required
@@ -160,7 +143,7 @@ def addevent(group_id):
 
     if form.validate_on_submit():
         new_event = Event(name=form.name.data, group=group.id, location=form.location.data, 
-            description=form.description.data)
+            date=form.date.data, description=form.description.data)
         db.session.add(new_event)
         new_event.joined_user.append(current_user)
         db.session.commit()

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Profile - Meetup!{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-primary" role="alert">{{ message }}</div>
+    {% endfor %}
+    <h3>My Profile</h3>
+    <p></p>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Name: {{ user.username }}</li>
+        <li class="list-group-item">Email: {{ user.email }}</li>
+        <li class="list-group-item">Location: {{ user.location }}</li>
+        <li class="list-group-item">Joined Date: {{ user.date_joined.date() }}</li>
+        <li class="list-group-item">Bio: {{ user.bio }}</li>
+    </ul>
+
+</div>
+{% endblock %}

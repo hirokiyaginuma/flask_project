@@ -17,6 +17,9 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(50), unique=True)
+    location = db.Column(db.String(50))
+    date_joined = db.Column(db.DateTime)
+    bio = db.Column(db.Text)
     password = db.Column(db.String(80))
     owned_group = db.relationship('Group', backref='owned_group')
     joined_group = db.relationship('Group', secondary=groups, lazy='subquery',
@@ -38,6 +41,7 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     location = db.Column(db.String(50))
+    date = db.Column(db.DateTime)
     description = db.Column(db.Text)
     group = db.Column(db.Integer, db.ForeignKey('group.id'))
     joined_user = db.relationship('User', secondary=events, lazy='subquery',
