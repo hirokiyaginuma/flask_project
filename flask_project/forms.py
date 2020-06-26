@@ -25,3 +25,6 @@ class EventForm(FlaskForm):
     date = DateField('Date')
     location = StringField('Location', validators=[InputRequired(), Length(max=50)])
     description = TextAreaField('Description', validators=[InputRequired(), Length(max=500)])
+
+class CommentForm(FlaskForm):
+    comment = StringField('Comment', validators=[InputRequired(), Length(max=200)])

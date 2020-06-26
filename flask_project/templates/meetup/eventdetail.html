@@ -26,5 +26,17 @@
     <div>
         <a href="{{ url_for('meetup.joinevent', group_id=group.id, event_id=event.id) }}" class="btn btn-primary">Join this event</a>
     </div>
+    <p></p>
+    <h3>Comments</h3>
+    <ul class="list-group list-group-flush">
+        {% for comment in event.comment %}
+        <li class="list-group-item">{{ user.filter_by(id=comment.user).one().username }}: {{ comment.body }}</li>
+        {% endfor %}
+    </ul>
+    <form class="form-signin" method="POST" action="/meetup/group/{{ group.id }}/event/{{ event.id }} ">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_field(form.comment) }}
+        <button class="tbn btn-lg btn-primary" type="submit">Submit</button>
+    </form>
 </div>
 {% endblock %}

@@ -26,6 +26,7 @@ class User(UserMixin, db.Model):
         backref=db.backref('joined_group', lazy=True))
     joined_event = db.relationship('Event', secondary=events, lazy='subquery',
         backref=db.backref('joined_event', lazy=True))
+    comment = db.relationship('Comment', backref='user_comment', lazy=True)
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,3 +47,13 @@ class Event(db.Model):
     group = db.Column(db.Integer, db.ForeignKey('group.id'))
     joined_user = db.relationship('User', secondary=events, lazy='subquery',
         backref=db.backref('joined_user_event', lazy=True))
+    comment = db.relationship('Comment', backref='event_comment', lazy=True)
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.String(200), nullable=False)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'),
+        nullable=False)
+    event = db.Column(db.Integer, db.ForeignKey('event.id'),
+        nullable=False)
+

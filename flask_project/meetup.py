@@ -6,8 +6,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from datetime import datetime
 
 from . import login_manager
-from .models import db, User, Group, Event
-from .forms import LoginForm, RegisterForm, GroupForm, EventForm
+from .models import db, User, Group, Event, Comment
+from .forms import LoginForm, RegisterForm, GroupForm, EventForm, CommentForm
 
 bp = Blueprint('meetup', __name__, url_prefix='/meetup')
 
@@ -153,17 +153,28 @@ def addevent(group_id):
 
     return render_template('meetup/addevent.html', group=group, form=form)
 
-@bp.route('/group/<int:group_id>/event/<int:event_id>')
+@bp.route('/group/<int:group_id>/event/<int:event_id>', methods=('GET', 'POST'))
 @login_required
 def event_detail(group_id, event_id):
+    form = CommentForm()
+
+    user = User.query
     group = Group.query.filter_by(id=group_id).one()
     event = Event.query.filter_by(id=event_id).one()
     
     if not (current_user in group.joined_user):
         flash('You have to join the group to see events.')
-        return redirect(url_for('meetup.group_detail', group_id=group_id))
+        return redirect(url_for('meetup.group_detail', form=form, user=user, group=group, event=event))
 
-    return render_template('meetup/eventdetail.html', group=group, event=event)
+    if form.validate_on_submit():
+        new_comment = Comment(body=form.comment.data, user=current_user.id, event=event.id)
+        db.session.add(new_comment)
+        db.session.commit()
+
+        flash('You added a new comment!')
+        return render_template('meetup/eventdetail.html', form=form, user=user, group=group, event=event)
+
+    return render_template('meetup/eventdetail.html', form=form, user=user, group=group, event=event)
 
 @bp.route('/api/joingroup/<int:group_id>')
 @login_required
